@@ -105,7 +105,7 @@ def product_alt_view(request,pk=None,*args,**kwargs):
 
     if method=="GET":
         if pk is not None:
-            #detail view logic
+            #detail view 
             obj=get_object_or_404(Product, pk=pk)
             data=ProductSerializer(obj, many=False).data 
             return Response(data)
