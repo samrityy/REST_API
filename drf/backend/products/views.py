@@ -1,4 +1,4 @@
-from rest_framework import authentication,generics,mixins,permissions
+from rest_framework import generics,mixins
 from .models import Product
 from .serializers import ProductSerializer
 from rest_framework.decorators import api_view
@@ -6,14 +6,14 @@ from rest_framework.response import Response
 #from django.http import Http 404
 from django.shortcuts import get_object_or_404
 
+from api.mixins import StaffEditorPermissionMixin
+
 
 
 #list
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(StaffEditorPermissionMixin,generics.ListCreateAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
-    authentication_classes=[authentication.SessionAuthentication]
-    permission_classes =[permissions.DjangoModelPermissions]
 
     def perform_create(self,serializer):
         # serializer.save(user=self.request.user)
@@ -33,14 +33,14 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 #     serializer_class=ProductSerializer
 
 #detail view
-class ProductDetailAPIView(generics.RetrieveAPIView):
+class ProductDetailAPIView(StaffEditorPermissionMixin,generics.RetrieveAPIView):
     queryset= Product.objects.all()
     serializer_class=ProductSerializer
     #lookup_field ='pk'
 
 
 #update
-class ProductUpdateAPIView(generics.UpdateAPIView):
+class ProductUpdateAPIView(StaffEditorPermissionMixin,generics.UpdateAPIView):
     queryset= Product.objects.all()
     serializer_class=ProductSerializer
     #lookup_field ='pk'
@@ -53,7 +53,7 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
         if not instance.content:
             instance.content=instance.title
 
-class ProductDestroyAPIView(generics.DestroyAPIView):
+class ProductDestroyAPIView(StaffEditorPermissionMixin,generics.DestroyAPIView):
     queryset= Product.objects.all()
     serializer_class=ProductSerializer
     #lookup_field ='pk'
@@ -122,6 +122,13 @@ def product_alt_view(request,pk=None,*args,**kwargs):
             if content is None:
                 content =title
             serializer.save(content=content)
-            return Response(serializer.data)
+            return Response(serializer.data)    
+
+
+
+
+
+
+
         return Response({"invalid":"not good data"}, status=400)
     
